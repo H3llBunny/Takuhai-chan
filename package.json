@@ -1,0 +1,26 @@
+{
+  "name": "takuhai-chan",
+  "version": "1.0.0",
+  "description": "Discord bot that can be used to track different packages from selected courier/ shipping companies.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/H3llBunny/Takuhai-chan.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/H3llBunny/Takuhai-chan/issues"
+  },
+  "homepage": "https://github.com/H3llBunny/Takuhai-chan#readme",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.9.1"
+  }
+}
