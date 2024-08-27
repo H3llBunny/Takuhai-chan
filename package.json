@@ -18,7 +18,8 @@
   "homepage": "https://github.com/H3llBunny/Takuhai-chan#readme",
   "dependencies": {
     "discord.js": "^14.15.3",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "mongodb": "6.8"
   },
   "devDependencies": {
     "eslint": "^9.9.1"
