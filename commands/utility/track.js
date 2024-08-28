@@ -20,7 +20,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
     const courier = interaction.options.getString('couriers');
     const trackingNumber = interaction.options.getString('tracking_number');
     const packageName = interaction.options.getString('package_name');
@@ -43,14 +43,8 @@ module.exports = {
       const existingPackage = user.packages.find((pkg) => pkg.trackingNumber === trackingNumber);
 
       if (existingPackage) {
-        await usersCollection.updateOne(
-          { _id: userId, 'packages.trackingNumber': trackingNumber },
-          {
-            $set: {
-              'packages.$.lastStatus': latestStatus,
-              'packages.$.lastRefresh': new Date().toUTCString(),
-            },
-          }
+        await interaction.editReply(
+          `<\@${interaction.user.id}> this package is already being tracked, you can use the command \`\`/packages\`\` to get the latest status`
         );
       } else {
         await usersCollection.updateOne(
@@ -61,14 +55,22 @@ module.exports = {
             },
           }
         );
+        await interaction.channel.send(
+          `<\@${interaction.user.id}> Package with name: \*\*${packageName}\*\* was added to your tracking list`,
+          { ephemeral: false }
+        );
+        await interaction.deleteReply();
       }
     } else {
       await usersCollection.insertOne({
         _id: userId,
         packages: [packageData],
       });
+      await interaction.channel.send(
+        `<\@${interaction.user.id}> Package with name: \*\*${packageName}\*\* was added to your tracking list`,
+        { ephemeral: false }
+      );
+      await interaction.deleteReply();
     }
-
-    await interaction.editReply(`Latest status for ${packageName}: ${latestStatus}`);
   },
 };
