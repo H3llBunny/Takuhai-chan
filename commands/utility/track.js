@@ -21,6 +21,7 @@ module.exports = {
 
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+
     const courier = interaction.options.getString('couriers');
     const trackingNumber = interaction.options.getString('tracking_number');
     const packageName = interaction.options.getString('package_name');
@@ -31,6 +32,7 @@ module.exports = {
     //if success
     const usersCollection = await mongoDbService.getCollection('users');
     const user = await usersCollection.findOne({ _id: userId });
+
     const packageData = {
       courier,
       trackingNumber,
@@ -56,7 +58,7 @@ module.exports = {
           }
         );
         await interaction.channel.send(
-          `<\@${interaction.user.id}> Package with name: \*\*${packageName}\*\* was added to your tracking list`,
+          `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
           { ephemeral: false }
         );
         await interaction.deleteReply();
@@ -67,7 +69,7 @@ module.exports = {
         packages: [packageData],
       });
       await interaction.channel.send(
-        `<\@${interaction.user.id}> Package with name: \*\*${packageName}\*\* was added to your tracking list`,
+        `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
         { ephemeral: false }
       );
       await interaction.deleteReply();

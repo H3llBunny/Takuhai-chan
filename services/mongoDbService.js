@@ -18,16 +18,6 @@ const getCollection = async (collectionName) => {
     return database.collection(collectionName);
 }
 
-const insertDocument = async (collectionName, document) => {
-    const collection = await getCollection(collectionName);
-    return collection.insertOne(document);
-}
-
-const findDocument = async (collectionName, query = {}) => {
-    const collection = await getCollection(collectionName);
-    return collection.find(query).toArray();
-}
-
 const closeConnection = async () => {
     if (client) {
       await client.close();
@@ -39,6 +29,5 @@ const closeConnection = async () => {
   module.exports = {
     connectToDatabase,
     getCollection,
-    insertDocument,
-    findDocument
+    closeConnection,
   };
