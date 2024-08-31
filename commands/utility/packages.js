@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
+const econtService = require('../../services/econtService');
 
 module.exports = {
   data: new SlashCommandBuilder().setName('packages').setDescription('Returns the last status of all your packages'),
@@ -18,7 +19,19 @@ module.exports = {
         const timeDifferenceInHours = (new Date() - new Date(pkg.lastRefresh)) / (1000 * 60 * 60);
 
         if (timeDifferenceInHours > 1) {
-          let newStatus = 'test status from service'; // Here I will call the services which will get the latest status
+          let newStatus;
+
+          switch (pkg.courier) {
+            case 'econt':
+              newStatus = await econtService.trackShipment(pkg.trackingNumber);
+              break;
+            case 'speedy':
+              newStatus = '';
+              break;
+            default:
+              throw new Error('There was an error tracking the shipment.');
+          }
+          
           await usersCollection.updateOne(
             { _id: userId, 'packages.trackingNumber': pkg.trackingNumber },
             {
@@ -35,7 +48,8 @@ module.exports = {
         updatedPackages.push(`**Package name:** \`\`${pkg.packageName}\`\` **Last status:** \`\`${pkg.lastStatus}\`\``);
       }
 
-      const replyMessage = updatedPackages.length > 0 ? updatedPackages.join('\n') : "You don't have any packages being tracked";
+      const replyMessage =
+        updatedPackages.length > 0 ? updatedPackages.join('\n') : "You don't have any packages being tracked";
 
       await interaction.editReply(replyMessage);
     } else {

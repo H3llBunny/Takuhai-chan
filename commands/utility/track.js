@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
+const econtService = require('../../services/econtService');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -27,9 +28,24 @@ module.exports = {
     const packageName = interaction.options.getString('package_name');
     const userId = interaction.user.id;
 
-    // switch case for couriers which service to use
-    const latestStatus = 'test status';
-    //if success
+    let latestStatus;
+
+    try {
+      switch (courier) {
+        case 'econt':
+          latestStatus = await econtService.trackShipment(trackingNumber);
+          break;
+        case 'speedy':
+          latestStatus = '';
+          break;
+        default:
+          throw new Error('Invalid courier selected');
+      }
+    } catch (error) {
+      await interaction.editReply(error.message);
+      return;
+    }
+
     const usersCollection = await mongoDbService.getCollection('users');
     const user = await usersCollection.findOne({ _id: userId });
 
