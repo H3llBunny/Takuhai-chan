@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
 const econtService = require('../../services/econtService');
+const speedyService = require('../../services/speedyService');
+const bgpostService = require('../../services/bgpostService');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -11,7 +13,11 @@ module.exports = {
         .setName('couriers')
         .setDescription('Choose a courier')
         .setRequired(true)
-        .addChoices({ name: 'Econt', value: 'econt' }, { name: 'Speedy', value: 'speedy' })
+        .addChoices(
+          { name: 'Econt', value: 'econt' },
+          { name: 'Speedy', value: 'speedy' },
+          { name: 'BG Post', value: 'bgpost' }
+        )
     )
     .addStringOption((option) =>
       option.setName('tracking_number').setDescription('Please provide your tracking number').setRequired(true)
@@ -28,15 +34,18 @@ module.exports = {
     const packageName = interaction.options.getString('package_name');
     const userId = interaction.user.id;
 
-    let latestStatus;
+    let statuses = [];
 
     try {
       switch (courier) {
         case 'econt':
-          latestStatus = await econtService.trackShipment(trackingNumber);
+          statuses = await econtService.trackShipment(trackingNumber);
           break;
         case 'speedy':
-          latestStatus = '';
+          statuses = await speedyService.trackShipment(trackingNumber);
+          break;
+        case 'bgpost':
+          statuses = await bgpostService.trackShipment(trackingNumber);
           break;
         default:
           throw new Error('Invalid courier selected');
@@ -53,7 +62,7 @@ module.exports = {
       courier,
       trackingNumber,
       packageName,
-      lastStatus: latestStatus,
+      statuses: statuses,
       lastRefresh: new Date().toUTCString(),
     };
 
@@ -62,7 +71,7 @@ module.exports = {
 
       if (existingPackage) {
         await interaction.editReply(
-          `<\@${interaction.user.id}> this package is already being tracked, you can use the command \`\`/packages\`\` to get the latest status`
+          `<\@${interaction.user.id}> this package is already tracked, use command \`\`/packages\`\` to get the latest 3 statuses`
         );
       } else {
         await usersCollection.updateOne(

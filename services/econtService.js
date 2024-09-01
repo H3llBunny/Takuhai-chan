@@ -22,8 +22,8 @@ async function trackShipment(trackingNumber) {
 
     const shipmentData = await response.json();
 
+    shipmentData;
     return getLatestShipmentStatus(shipmentData);
-
   } catch (error) {
     console.error('Error tracking the shipment:', error);
     throw new Error('Error, please make sure the tracking number is correct');
@@ -31,25 +31,28 @@ async function trackShipment(trackingNumber) {
 }
 
 function getLatestShipmentStatus(shipmentData) {
-  if(!shipmentData || shipmentData.lenght === 0) {
+  if (!shipmentData || shipmentData.lenght === 0) {
     return 'Няма налични данни за пратката';
   }
 
-  const shipmentStatus = shipmentData?.shipmentStatuses?.[0]?.status;
+  const shipmentStatuses = shipmentData?.shipmentStatuses?.[0]?.status;
 
-  if (!shipmentStatus || !shipmentStatus.trackingEvents || shipmentStatus.trackingEvents.length === 0) {
-    return 'Няма налични данни за пратката';
+  if (!shipmentStatuses || shipmentStatuses.trackingEvents.length === 0) {
+    return [{ status: 'Няма налични данни за пратката', time: new Date().toUTCString() }];
   }
 
-  const latestEvent  = shipmentStatus.trackingEvents.reduce((latest, current) => {
-    return current.time > latest.time ? current : latest;
+  const statuses = shipmentStatuses.trackingEvents.map((event) => {
+    const mappedStatus = statusMessages[event.destinationType];
+    const officeName = event.officeName;
+    const evenTime = new Date(event.time).toUTCString();
+
+    return {
+      description: `${mappedStatus} - ${officeName} Eконт`,
+      time: evenTime,
+    };
   });
 
-  const { destinationType, officeName } = latestEvent;
-
-  const mappedStatus = statusMessages[destinationType] || 'Статусът не е наличен';
-  
-  return `${mappedStatus} - ${officeName + ' Еконт' || 'Офисът не е наличен'}`;
+  return statuses;
 }
 
 module.exports = {
