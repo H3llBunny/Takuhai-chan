@@ -2,6 +2,7 @@ const { SlashCommandBuilder, StickerPackApplicationId } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
 const econtService = require('../../services/econtService');
 const bgpostService = require('../../services/bgpostService');
+const expressOneService = require('../../services/expressOneService');
 const MAX_MESSAGE_LENGTH = 2000;
 
 module.exports = {
@@ -41,11 +42,14 @@ module.exports = {
               case 'econt':
                 newStatuses = await econtService.trackShipment(pkg.trackingNumber);
                 break;
-              case 'speedy':
-                newStatuses = '';
-                break;
+              // case 'speedy':
+              //   newStatuses = '';
+              //   break;
               case 'bgpost':
                 newStatuses = await bgpostService.trackShipment(pkg.trackingNumber);
+                break;
+              case 'expressOne':
+                newStatuses = await expressOneService.trackShipment(pkg.trackingNumber);
                 break;
               default:
                 await interaction.editReply('Error: Unknown courier');
@@ -80,7 +84,9 @@ module.exports = {
             return `- ${status.description} - ${formattedTime}`;
           });
 
-          const packageMessage = `**Package from ${pkg.courier}:** \`\`${pkg.packageName}\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
+          const packageMessage = `**Package from ${pkg.courier}:** \`\`${
+            pkg.packageName
+          }\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
 
           messages.push(packageMessage);
         }

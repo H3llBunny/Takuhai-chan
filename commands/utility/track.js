@@ -3,6 +3,7 @@ const mongoDbService = require('../../services/mongoDbService');
 const econtService = require('../../services/econtService');
 const speedyService = require('../../services/speedyService');
 const bgpostService = require('../../services/bgpostService');
+const expressOneService = require('../../services/expressOneService');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,8 +16,9 @@ module.exports = {
         .setRequired(true)
         .addChoices(
           { name: 'Econt', value: 'econt' },
-          { name: 'Speedy', value: 'speedy' },
-          { name: 'BG Post', value: 'bgpost' }
+          //{ name: 'Speedy', value: 'speedy' },
+          { name: 'BG Post', value: 'bgpost' },
+          { name: 'ExpressOne', value: 'expressOne'},
         )
     )
     .addStringOption((option) =>
@@ -41,11 +43,14 @@ module.exports = {
         case 'econt':
           statuses = await econtService.trackShipment(trackingNumber);
           break;
-        case 'speedy':
-          statuses = await speedyService.trackShipment(trackingNumber);
-          break;
+        // case 'speedy':
+        //   statuses = await speedyService.trackShipment(trackingNumber);
+        //   break;
         case 'bgpost':
           statuses = await bgpostService.trackShipment(trackingNumber);
+          break;
+        case 'expressOne':
+          statuses = await expressOneService.trackShipment(trackingNumber);
           break;
         default:
           throw new Error('Invalid courier selected');
