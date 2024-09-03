@@ -1,5 +1,4 @@
 const statusMessages = require('./statusMessages');
-require('dotenv').config();
 const { ECONT_API_URL } = process.env;
 
 async function trackShipment(trackingNumber) {
