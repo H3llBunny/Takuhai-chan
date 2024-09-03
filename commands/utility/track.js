@@ -27,83 +27,87 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
-
-    const courier = interaction.options.getString('couriers');
-    const trackingNumber = interaction.options.getString('tracking_number');
-    const packageName = interaction.options.getString('package_name');
-    const userId = interaction.user.id;
-
-    let statuses = [];
-
     try {
-      switch (courier) {
-        case 'econt':
-          statuses = await econtService.trackShipment(trackingNumber);
-          break;
-        // case 'speedy':
-        //   statuses = await speedyService.trackShipment(trackingNumber);
-        //   break;
-        case 'bgpost':
-          statuses = await bgpostService.trackShipment(trackingNumber);
-          break;
-        case 'expressOne':
-          statuses = await expressOneService.trackShipment(trackingNumber);
-          break;
-        case 'dhl':
-          statuses = await dhlService.trackShipment(trackingNumber);
-          break;
-        default:
-          throw new Error('Invalid courier selected');
+      await interaction.deferReply({ ephemeral: true });
+
+      const courier = interaction.options.getString('couriers');
+      const trackingNumber = interaction.options.getString('tracking_number');
+      const packageName = interaction.options.getString('package_name');
+      const userId = interaction.user.id;
+  
+      let statuses = [];
+  
+      try {
+        switch (courier) {
+          case 'econt':
+            statuses = await econtService.trackShipment(trackingNumber);
+            break;
+          // case 'speedy':
+          //   statuses = await speedyService.trackShipment(trackingNumber);
+          //   break;
+          case 'bgpost':
+            statuses = await bgpostService.trackShipment(trackingNumber);
+            break;
+          case 'expressOne':
+            statuses = await expressOneService.trackShipment(trackingNumber);
+            break;
+          case 'dhl':
+            statuses = await dhlService.trackShipment(trackingNumber);
+            break;
+          default:
+            throw new Error('Invalid courier selected');
+        }
+      } catch (error) {
+        await interaction.editReply(error.message);
+        return;
       }
-    } catch (error) {
-      await interaction.editReply(error.message);
-      return;
-    }
-
-    const usersCollection = await mongoDbService.getCollection('users');
-    const user = await usersCollection.findOne({ _id: userId });
-
-    const packageData = {
-      courier,
-      trackingNumber,
-      packageName,
-      statuses: statuses,
-      lastRefresh: new Date().toUTCString(),
-    };
-
-    if (user) {
-      const existingPackage = user.packages.find((pkg) => pkg.trackingNumber === trackingNumber);
-
-      if (existingPackage) {
-        await interaction.editReply(
-          `<\@${interaction.user.id}> this package is already tracked, use command \`\`/packages\`\` to get the latest 3 statuses`
-        );
+  
+      const usersCollection = await mongoDbService.getCollection('users');
+      const user = await usersCollection.findOne({ _id: userId });
+  
+      const packageData = {
+        courier,
+        trackingNumber,
+        packageName,
+        statuses: statuses,
+        lastRefresh: new Date().toUTCString(),
+      };
+  
+      if (user) {
+        const existingPackage = user.packages.find((pkg) => pkg.trackingNumber === trackingNumber);
+  
+        if (existingPackage) {
+          await interaction.editReply(
+            `<\@${interaction.user.id}> this package is already tracked, use command \`\`/packages\`\` to get the latest 3 statuses`
+          );
+        } else {
+          await usersCollection.updateOne(
+            { _id: userId },
+            {
+              $push: {
+                packages: packageData,
+              },
+            }
+          );
+          await interaction.channel.send(
+            `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
+            { ephemeral: false }
+          );
+          await interaction.deleteReply();
+        }
       } else {
-        await usersCollection.updateOne(
-          { _id: userId },
-          {
-            $push: {
-              packages: packageData,
-            },
-          }
-        );
+        await usersCollection.insertOne({
+          _id: userId,
+          packages: [packageData],
+        });
         await interaction.channel.send(
           `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
           { ephemeral: false }
         );
         await interaction.deleteReply();
       }
-    } else {
-      await usersCollection.insertOne({
-        _id: userId,
-        packages: [packageData],
-      });
-      await interaction.channel.send(
-        `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
-        { ephemeral: false }
-      );
-      await interaction.deleteReply();
+    } catch (error) {
+      console.log(error);
     }
   },
 };

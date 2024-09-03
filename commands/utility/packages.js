@@ -74,6 +74,7 @@ module.exports = {
           }
 
           const statusesToDisplay = fullHistory ? pkg.statuses : pkg.statuses.slice(-3);
+          console.log(statusesToDisplay);
 
           const statusMessages = statusesToDisplay.map((status) => {
             let formattedTime;
