@@ -22,15 +22,14 @@ async function trackShipment(trackingNumber) {
 
     const shipmentData = await response.json();
 
-    shipmentData;
-    return getLatestShipmentStatus(shipmentData);
+    return getShipmentStatuses(shipmentData);
   } catch (error) {
     console.error('Error tracking the shipment:', error);
     throw new Error('Error, please make sure the tracking number is correct');
   }
 }
 
-function getLatestShipmentStatus(shipmentData) {
+function getShipmentStatuses(shipmentData) {
   if (!shipmentData || shipmentData.lenght === 0) {
     return 'Няма налични данни за пратката';
   }

@@ -3,6 +3,7 @@ const mongoDbService = require('../../services/mongoDbService');
 const econtService = require('../../services/econtService');
 const bgpostService = require('../../services/bgpostService');
 const expressOneService = require('../../services/expressOneService');
+const dhlService = require('../../services/dhlService');
 const MAX_MESSAGE_LENGTH = 2000;
 
 module.exports = {
@@ -50,6 +51,9 @@ module.exports = {
                 break;
               case 'expressOne':
                 newStatuses = await expressOneService.trackShipment(pkg.trackingNumber);
+                break;
+              case 'dhl':
+                newStatuses = await dhlService.trackShipment(pkg.trackingNumber);
                 break;
               default:
                 await interaction.editReply('Error: Unknown courier');

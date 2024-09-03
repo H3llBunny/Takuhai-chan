@@ -4,22 +4,20 @@ const econtService = require('../../services/econtService');
 const speedyService = require('../../services/speedyService');
 const bgpostService = require('../../services/bgpostService');
 const expressOneService = require('../../services/expressOneService');
+const dhlService = require('../../services/dhlService');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('track')
     .setDescription('Add a new tracking number')
     .addStringOption((option) =>
-      option
-        .setName('couriers')
-        .setDescription('Choose a courier')
-        .setRequired(true)
-        .addChoices(
-          { name: 'Econt', value: 'econt' },
-          //{ name: 'Speedy', value: 'speedy' },
-          { name: 'BG Post', value: 'bgpost' },
-          { name: 'ExpressOne', value: 'expressOne'},
-        )
+      option.setName('couriers').setDescription('Choose a courier').setRequired(true).addChoices(
+        { name: 'Econt', value: 'econt' },
+        //{ name: 'Speedy', value: 'speedy' },
+        { name: 'BG Post', value: 'bgpost' },
+        { name: 'ExpressOne', value: 'expressOne' },
+        { name: 'DHL', value: 'dhl' }
+      )
     )
     .addStringOption((option) =>
       option.setName('tracking_number').setDescription('Please provide your tracking number').setRequired(true)
@@ -51,6 +49,9 @@ module.exports = {
           break;
         case 'expressOne':
           statuses = await expressOneService.trackShipment(trackingNumber);
+          break;
+        case 'dhl':
+          statuses = await dhlService.trackShipment(trackingNumber);
           break;
         default:
           throw new Error('Invalid courier selected');
