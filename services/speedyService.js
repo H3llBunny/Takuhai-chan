@@ -1,4 +1,3 @@
-require('dotenv').config();
 const { SPEEDY_API_URL, SPEEDY_USERNAME, SPEEDY_PW } = process.env;
 
 async function trackShipment(trackingNumber) {
