@@ -1,4 +1,3 @@
-require('dotenv').config();
 const { DHL_API_KEY } = process.env;
 const { DHL_API_URL } = process.env;
 
