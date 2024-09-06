@@ -5,6 +5,7 @@ const speedyService = require('../../services/speedyService');
 const bgpostService = require('../../services/bgpostService');
 const expressOneService = require('../../services/expressOneService');
 const dhlService = require('../../services/dhlService');
+const samedayService = require('../../services/samedayService');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,7 +17,8 @@ module.exports = {
         //{ name: 'Speedy', value: 'speedy' },
         { name: 'BG Post', value: 'bgpost' },
         { name: 'ExpressOne', value: 'expressOne' },
-        { name: 'DHL', value: 'dhl' }
+        { name: 'DHL', value: 'dhl' },
+        { name: 'Sameday', value: 'sameday' },
       )
     )
     .addStringOption((option) =>
@@ -52,6 +54,9 @@ module.exports = {
           break;
         case 'dhl':
           statuses = await dhlService.trackShipment(trackingNumber);
+          break;
+        case 'sameday':
+          statuses = await samedayService.trackShipment(trackingNumber);
           break;
         default:
           throw new Error('Invalid courier selected');

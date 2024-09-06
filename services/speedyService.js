@@ -4,11 +4,12 @@ async function trackShipment(trackingNumber) {
   const requestBody = {
     userName: SPEEDY_USERNAME,
     password: SPEEDY_PW,
-    shipmentIds: [trackingNumber],
+    language: 'BG',
+    parcels: [{ id: trackingNumber }],
   };
 
   try {
-    const response = await fetch(SPEEDY_API_URL, {
+    const response = await fetch(`${SPEEDY_API_URL}track`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
