@@ -39,7 +39,12 @@ async function trackShipment(trackingNumber) {
   });
 
   await browser.close();
-  return allstatuses.length > 0 ? allstatuses : 'No tracking updates available';
+
+  if (allstatuses.length === 0) {
+    throw new Error('No tracking updates available');
+  }
+  
+  return allstatuses;
 }
 
 module.exports = {
