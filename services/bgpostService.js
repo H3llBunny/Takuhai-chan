@@ -1,20 +1,25 @@
 const puppeteer = require('puppeteer-core');
 
 async function trackShipment(trackingNumber) {
-  const browser = await puppeteer.launch({ 
+  const browser = await puppeteer.launch({
     headless: true,
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
   });
-  
+
   const page = await browser.newPage();
 
-  await page.goto('https://bgpost.bg/postal-services/track-package');
+  try {
+    await page.goto('https://bgpost.bg/postal-services/track-package');
 
-  await page.type('#table-search', trackingNumber);
+    await page.type('#table-search', trackingNumber);
 
-  await page.click('button.bg-gray');
+    await page.click('button.bg-gray');
 
-  await page.waitForSelector('.overflow-x-auto');
+    await page.waitForSelector('.overflow-x-auto');
+
+  } catch (error) {
+    throw new Error("There was an error loading the site, please try again.")
+  }
 
   const noRecordsFound = await page.evaluate(() => {
     const emptyMessage = document.querySelector('.ui-datatable-empty-message');
