@@ -46,7 +46,7 @@ module.exports = {
                 newStatuses = await econtService.trackShipment(pkg.trackingNumber);
                 break;
               case 'speedy':
-                newStatuses = '';
+                newStatuses = await speedyService.trackShipment(pkg.trackingNumber);;
                 break;
               case 'bgpost':
                 newStatuses = await bgpostService.trackShipment(pkg.trackingNumber);

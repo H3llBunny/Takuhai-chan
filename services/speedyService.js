@@ -1,48 +1,44 @@
-const { SPEEDY_API_URL, SPEEDY_USERNAME, SPEEDY_PW } = process.env;
+const puppeteer = require('puppeteer-core');
+const { SPEEDY_URL } = process.env;
 
 async function trackShipment(trackingNumber) {
-  const requestBody = {
-    userName: SPEEDY_USERNAME,
-    password: SPEEDY_PW,
-    language: 'BG',
-    parcels: [{ id: trackingNumber }],
-  };
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  });
+
+  const page = await browser.newPage();
+
+  await page.goto(`${SPEEDY_URL}${trackingNumber}`);
 
   try {
-    const response = await fetch(`${SPEEDY_API_URL}track`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.error) {
-      throw new Error(`Error from Speedy API: ${data.error}`);
-    }
-
-    const shipmentData = data.shipments[0];
-
-    return getLatestShipmentStatus(shipmentData);
-
+    await page.waitForSelector('table.shipment-table', { timeout: 5000 });
   } catch (error) {
-    console.error('Error tracking the shipment:', error);
-    throw new Error('Error, please make sure the tracking number is correct');
+    await browser.close();
+    throw new Error('Tracking number is invalid or there are no updates yet');
   }
-}
 
-function getLatestShipmentStatus(shipmentData) {
-    if (!shipmentData) {
-        return 'No shipment data available';
-      }
+  const allStatuses = await page.evaluate(() => {
+    const statusElements = document.querySelectorAll('tbody tr');
+
+    return Array.from(statusElements).map((element) => {
+      const dateTime = element.querySelector('td:nth-child(1)')?.innerText.trim() || '';
+      const descriptionTd = element.querySelector('td:nth-child(2)');
+      let description = descriptionTd.textContent.trim().replace(/\s+/g, ' ');
+      const location = element.querySelector('td:nth-child(3)')?.innerText.trim() || '';
+
+      return {
+        description: `${description}${location? ' - ' + location : ''}`,
+        time: `${dateTime}`,
+      };
+    });
+  });
+
+  await browser.close();
+
+  return allStatuses;
 }
 
 module.exports = {
-    trackShipment,
+  trackShipment,
 };

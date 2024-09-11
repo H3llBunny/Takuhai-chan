@@ -14,7 +14,7 @@ module.exports = {
     .addStringOption((option) =>
       option.setName('couriers').setDescription('Choose a courier').setRequired(true).addChoices(
         { name: 'Econt', value: 'econt' },
-        //{ name: 'Speedy', value: 'speedy' },
+        { name: 'Speedy', value: 'speedy' },
         { name: 'BG Post', value: 'bgpost' },
         { name: 'ExpressOne', value: 'expressOne' },
         { name: 'DHL', value: 'dhl' },
@@ -43,9 +43,9 @@ module.exports = {
         case 'econt':
           statuses = await econtService.trackShipment(trackingNumber);
           break;
-        // case 'speedy':
-        //   statuses = await speedyService.trackShipment(trackingNumber);
-        //   break;
+        case 'speedy':
+          statuses = await speedyService.trackShipment(trackingNumber);
+          break;
         case 'bgpost':
           statuses = await bgpostService.trackShipment(trackingNumber);
           break;
