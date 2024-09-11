@@ -11,6 +11,7 @@
 <h4>Current list with supported couriers:</h4>
 <ul>
   <li>Econt</li>
+  <li>Speedy</li>
   <li>BG Post</li>
   <li>Express One</li>
   <li>DHL</li>
