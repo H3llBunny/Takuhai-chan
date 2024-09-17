@@ -93,12 +93,7 @@ module.exports = {
             return `- ${status.description} - ${formattedTime}`;
           });
 
-<<<<<<< HEAD
           const packageMessage = `**Package from ${pkg.courier}:** \`\`${pkg.packageName}\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
-=======
-          const packageMessage = `**Package from ${pkg.courier}:** \`\`${pkg.packageName
-            }\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
->>>>>>> ff25798a0596c0443057fb0575a519ed6fb44b2a
 
           messages.push(packageMessage);
         }
