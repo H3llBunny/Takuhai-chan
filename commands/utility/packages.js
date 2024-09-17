@@ -1,9 +1,11 @@
 const { SlashCommandBuilder, StickerPackApplicationId } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
 const econtService = require('../../services/econtService');
+const speedyService = require('../../services/speedyService');
 const bgpostService = require('../../services/bgpostService');
 const expressOneService = require('../../services/expressOneService');
 const dhlService = require('../../services/dhlService');
+const samedayService = require('../../services/samedayService');
 const MAX_MESSAGE_LENGTH = 2000;
 
 module.exports = {
@@ -43,9 +45,9 @@ module.exports = {
               case 'econt':
                 newStatuses = await econtService.trackShipment(pkg.trackingNumber);
                 break;
-              // case 'speedy':
-              //   newStatuses = '';
-              //   break;
+              case 'speedy':
+                newStatuses = await speedyService.trackShipment(pkg.trackingNumber);;
+                break;
               case 'bgpost':
                 newStatuses = await bgpostService.trackShipment(pkg.trackingNumber);
                 break;
@@ -54,6 +56,9 @@ module.exports = {
                 break;
               case 'dhl':
                 newStatuses = await dhlService.trackShipment(pkg.trackingNumber);
+                break;
+              case 'sameday':
+                newStatuses = await samedayService.trackShipment(pkg.trackingNumber);
                 break;
               default:
                 await interaction.editReply('Error: Unknown courier');
@@ -88,7 +93,12 @@ module.exports = {
             return `- ${status.description} - ${formattedTime}`;
           });
 
+<<<<<<< HEAD
           const packageMessage = `**Package from ${pkg.courier}:** \`\`${pkg.packageName}\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
+=======
+          const packageMessage = `**Package from ${pkg.courier}:** \`\`${pkg.packageName
+            }\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
+>>>>>>> ff25798a0596c0443057fb0575a519ed6fb44b2a
 
           messages.push(packageMessage);
         }

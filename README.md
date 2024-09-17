@@ -11,9 +11,11 @@
 <h4>Current list with supported couriers:</h4>
 <ul>
   <li>Econt</li>
+  <li>Speedy</li>
   <li>BG Post</li>
   <li>Express One</li>
   <li>DHL</li>
+  <li>Sameday</li>
 </ul> 
 
 <p>Users can add packages by chosing a courier, providing a tracking number and also pick a name for the package. After that they can use another command get the last three statuses or the full history. Two more commands are available for updating a package name or deleting it after it has been recieved.</p>
