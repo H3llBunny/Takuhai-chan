@@ -1,11 +1,6 @@
 const { SlashCommandBuilder, StickerPackApplicationId } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
-const econtService = require('../../services/econtService');
-const speedyService = require('../../services/speedyService');
-const bgpostService = require('../../services/bgpostService');
-const expressOneService = require('../../services/expressOneService');
-const dhlService = require('../../services/dhlService');
-const samedayService = require('../../services/samedayService');
+const courierServices = require('../../services/courierServices');
 const MAX_MESSAGE_LENGTH = 2000;
 
 module.exports = {
@@ -39,31 +34,14 @@ module.exports = {
           const timeDifferenceInHours = (new Date() - new Date(pkg.lastRefresh)) / (1000 * 60 * 60);
 
           if (timeDifferenceInHours > 1) {
-            let newStatuses;
+            const courierService = courierServices[pkg.courier];
 
-            switch (pkg.courier) {
-              case 'econt':
-                newStatuses = await econtService.trackShipment(pkg.trackingNumber);
-                break;
-              case 'speedy':
-                newStatuses = await speedyService.trackShipment(pkg.trackingNumber);;
-                break;
-              case 'bgpost':
-                newStatuses = await bgpostService.trackShipment(pkg.trackingNumber);
-                break;
-              case 'expressOne':
-                newStatuses = await expressOneService.trackShipment(pkg.trackingNumber);
-                break;
-              case 'dhl':
-                newStatuses = await dhlService.trackShipment(pkg.trackingNumber);
-                break;
-              case 'sameday':
-                newStatuses = await samedayService.trackShipment(pkg.trackingNumber);
-                break;
-              default:
-                await interaction.editReply('Error: Unknown courier');
-                return;
+            if (!courierService) {
+              await interaction.editReply('Error: Unknown courier');
+              return;
             }
+
+            const newStatuses = await courierService.trackShipment(pkg.trackingNumber);
 
             await usersCollection.updateOne(
               { _id: userId, 'packages.trackingNumber': pkg.trackingNumber },
@@ -93,7 +71,7 @@ module.exports = {
             return `- ${status.description} - ${formattedTime}`;
           });
 
-          const packageMessage = `**Package from ${pkg.courier}:** \`\`${pkg.packageName}\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
+          const packageMessage = `**Package from ${pkg.courier.toUpperCase()}:** \`\`${pkg.packageName}\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
 
           messages.push(packageMessage);
         }

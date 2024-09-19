@@ -1,25 +1,24 @@
 const { SlashCommandBuilder } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
-const econtService = require('../../services/econtService');
-const speedyService = require('../../services/speedyService');
-const bgpostService = require('../../services/bgpostService');
-const expressOneService = require('../../services/expressOneService');
-const dhlService = require('../../services/dhlService');
-const samedayService = require('../../services/samedayService');
+const courierServices = require('../../services/courierServices');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('track')
     .setDescription('Add a new tracking number')
     .addStringOption((option) =>
-      option.setName('couriers').setDescription('Choose a courier').setRequired(true).addChoices(
-        { name: 'Econt', value: 'econt' },
-        { name: 'Speedy', value: 'speedy' },
-        { name: 'BG Post', value: 'bgpost' },
-        { name: 'ExpressOne', value: 'expressOne' },
-        { name: 'DHL', value: 'dhl' },
-        { name: 'Sameday', value: 'sameday' },
-      )
+      option
+        .setName('couriers')
+        .setDescription('Choose a courier')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Econt', value: 'econt' },
+          { name: 'Speedy', value: 'speedy' },
+          { name: 'BG Post', value: 'bgpost' },
+          { name: 'ExpressOne', value: 'expressOne' },
+          { name: 'DHL', value: 'dhl' },
+          { name: 'Sameday', value: 'sameday' }
+        )
     )
     .addStringOption((option) =>
       option.setName('tracking_number').setDescription('Please provide your tracking number').setRequired(true)
@@ -39,28 +38,13 @@ module.exports = {
     let statuses = [];
 
     try {
-      switch (courier) {
-        case 'econt':
-          statuses = await econtService.trackShipment(trackingNumber);
-          break;
-        case 'speedy':
-          statuses = await speedyService.trackShipment(trackingNumber);
-          break;
-        case 'bgpost':
-          statuses = await bgpostService.trackShipment(trackingNumber);
-          break;
-        case 'expressOne':
-          statuses = await expressOneService.trackShipment(trackingNumber);
-          break;
-        case 'dhl':
-          statuses = await dhlService.trackShipment(trackingNumber);
-          break;
-        case 'sameday':
-          statuses = await samedayService.trackShipment(trackingNumber);
-          break;
-        default:
-          throw new Error('Invalid courier selected');
+      const courierService = courierServices[courier];
+
+      if (!courierService) {
+        throw new Error('Invalid courier selected');
       }
+
+      statuses = await courierService.trackShipment(trackingNumber);
     } catch (error) {
       await interaction.editReply(error.message);
       return;
