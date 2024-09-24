@@ -1,10 +1,10 @@
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 
 async function trackShipment(trackingNumber) {
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    });
+        browser: 'firefox',
+      });
 
     const page = await browser.newPage();
 

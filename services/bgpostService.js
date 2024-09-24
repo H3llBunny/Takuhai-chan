@@ -1,9 +1,9 @@
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 
 async function trackShipment(trackingNumber) {
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    browser: 'firefox',
   });
 
   const page = await browser.newPage();
@@ -16,9 +16,8 @@ async function trackShipment(trackingNumber) {
     await page.click('button.bg-gray');
 
     await page.waitForSelector('.overflow-x-auto');
-
   } catch (error) {
-    throw new Error("There was an error loading the site, please try again.")
+    throw new Error('There was an error loading the site, please try again.');
   }
 
   const noRecordsFound = await page.evaluate(() => {
