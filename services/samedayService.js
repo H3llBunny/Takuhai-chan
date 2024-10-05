@@ -41,7 +41,7 @@ async function trackShipment(trackingNumber) {
         });
 
         await browser.close();
-        return result;
+        return result.reverse();
     } catch (error) {
         await browser.close();
         console.error(error);
