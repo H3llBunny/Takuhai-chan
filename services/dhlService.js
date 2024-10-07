@@ -1,7 +1,7 @@
 const { DHL_API_KEY } = process.env;
 const { DHL_API_URL } = process.env;
 
-async function trackShipment(trackingNumber) {
+async function trackShipment(trackingNumber, calledFromPackages = false) {
   const url = `${DHL_API_URL}trackingNumber=${trackingNumber}&service=express`;
 
   try {
@@ -19,33 +19,36 @@ async function trackShipment(trackingNumber) {
 
     const shipmentData = await response.json();
 
-
-    return getShipmentStatuses(shipmentData);
+    return getShipmentStatuses(shipmentData, calledFromPackages);
   } catch (error) {
     console.error('Error tracking the shipment:', error);
+    if (calledFromPackages) {
+      return [];
+    }
     throw new Error('Error, please make sure the tracking number is correct');
   }
 }
 
-function getShipmentStatuses(shipmentData) {
-    if (!shipmentData || shipmentData.lenght === 0) {
-        return 'Няма налични данни за пратката';
-      }
+function getShipmentStatuses(shipmentData, calledFromPackages = false) {
+  if (!shipmentData || !shipmentData.shipments || shipmentData.length === 0) {
+    if (calledFromPackages) {
+      return [];
+    }
+    return 'Няма налични данни за пратката';
+  }
 
-    const statuses = shipmentData.shipments[0].events.map((event) => {
-        const status = event.description;
-        const country = event.location.address.countryCode;
-        const timestamp = event.timestamp;
+  const statuses = shipmentData.shipments[0].events.map((event) => {
+    const status = event.description;
+    const country = event.location.address.countryCode;
+    const timestamp = event.timestamp;
 
-        return {
-            description: `${status} - ${country}`,
-            time: timestamp,
-        };
-    });
+    return {
+      description: `${status} - ${country}`,
+      time: timestamp,
+    };
+  });
 
-    const reversedStatuses = statuses.reverse();
-
-    return reversedStatuses;
+  return statuses.reverse();
 }
 
 module.exports = {

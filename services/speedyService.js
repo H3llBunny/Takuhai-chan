@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const { SPEEDY_URL } = process.env;
 
-async function trackShipment(trackingNumber) {
+async function trackShipment(trackingNumber, calledFromPackages = false) {
   const browser = await puppeteer.launch({
     headless: true,
     browser: 'firefox',
@@ -15,6 +15,10 @@ async function trackShipment(trackingNumber) {
     await page.waitForSelector('table.shipment-table', { timeout: 5000 });
   } catch (error) {
     await browser.close();
+    if (calledFromPackages) {
+      console.log(`Error: ${error.message }`);
+      return [];
+    }
     throw new Error('Tracking number is invalid or there are no updates yet');
   }
 
@@ -35,6 +39,14 @@ async function trackShipment(trackingNumber) {
   });
 
   await browser.close();
+
+  if (allStatuses.length === 0) {
+    if (calledFromPackages) {
+      console.log('No tracking updates available.');
+      return [];
+    }
+    throw new Error('No tracking updates available');
+  }
 
   return allStatuses;
 }

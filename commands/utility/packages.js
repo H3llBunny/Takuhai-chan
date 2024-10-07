@@ -41,19 +41,21 @@ module.exports = {
               return;
             }
 
-            const newStatuses = await courierService.trackShipment(pkg.trackingNumber);
+            const newStatuses = await courierService.trackShipment(pkg.trackingNumber, true);
 
-            await usersCollection.updateOne(
-              { _id: userId, 'packages.trackingNumber': pkg.trackingNumber },
-              {
-                $set: {
-                  'packages.$.statuses': newStatuses,
-                  'packages.$.lastRefresh': new Date().toUTCString(),
-                },
-              }
-            );
-
-            pkg.statuses = newStatuses;
+            if (newStatuses && newStatuses.length > 0){
+              await usersCollection.updateOne(
+                { _id: userId, 'packages.trackingNumber': pkg.trackingNumber },
+                {
+                  $set: {
+                    'packages.$.statuses': newStatuses,
+                    'packages.$.lastRefresh': new Date().toUTCString(),
+                  },
+                }
+              );
+  
+              pkg.statuses = newStatuses;
+            }
           }
 
           const statusesToDisplay = fullHistory ? pkg.statuses : pkg.statuses.slice(-3);

@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 
-async function trackShipment(trackingNumber) {
+async function trackShipment(trackingNumber, calledFromPackages = false) {
   const browser = await puppeteer.launch({
     headless: true,
     browser: 'firefox',
@@ -17,6 +17,11 @@ async function trackShipment(trackingNumber) {
 
     await page.waitForSelector('.overflow-x-auto');
   } catch (error) {
+    console.error(`Error while tracking package: ${error.message}`);
+    if (calledFromPackages) {
+      return [];
+    }
+
     throw new Error('There was an error loading the site, please try again.');
   }
 
@@ -27,6 +32,9 @@ async function trackShipment(trackingNumber) {
 
   if (noRecordsFound) {
     await browser.close();
+    if (calledFromPackages) {
+      return [];
+    }
     throw new Error('Не са намерени записи');
   }
 
