@@ -11,7 +11,7 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
   await page.goto(`https://sameday.bg/#awb=${trackingNumber}`);
 
   try {
-    await page.waitForTimeout(5000);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const isInvalid = await page.evaluate(() => {
       const errorElement = document.querySelector('.tracker-alert.show');
@@ -39,7 +39,7 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
         const country = element.querySelector('.col-country').innerHTML.trim();
 
         return {
-          description: `${status} - ${location} - ${country}`,
+          description: `${status}${location ? ' - ' + location : ''}${country ? ' - ' + country : ''}`,
           time: `${date}`,
         };
       });
@@ -54,7 +54,7 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
         }
         throw new Error('No tracking updates available');
       }
-      
+
     return result.reverse();
   } catch (error) {
     await browser.close();

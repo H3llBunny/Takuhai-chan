@@ -33,10 +33,10 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
     return Array.from(statusElements).map((element) => {
       const dateTime = element.querySelector('.label--transparent').innerText.trim();
       const description = element.querySelector('h4').innerText.trim();
-      const location = element.querySelector('h4 + span')?.innerText.trim() || '';
+      const location = element.querySelector('h4 + span')?.innerText.trim();
 
       return {
-        description: `${description} - ${location}`,
+        description: `${description}${location ? ' - ' + location : ''}`,
         time: `${dateTime}`,
       };
     });

@@ -57,7 +57,7 @@ function getShipmentStatuses(shipmentData) {
     const eventTime = new Date(event.time).toUTCString();
 
     return {
-      description: `${mappedStatus} - ${officeName} Eконт`,
+      description: `${mappedStatus} - ${officeName}`,
       time: eventTime,
     };
   });

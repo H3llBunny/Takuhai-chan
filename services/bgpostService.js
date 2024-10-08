@@ -47,17 +47,10 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
       const details = element.children[2].innerText.trim();
       const date = element.children[3].innerText.trim();
 
-      if (details) {
-        return {
-          description: `${status} - ${location} - ${details}`,
-          time: `${date}`,
-        };
-      } else {
-        return {
-          description: `${status} - ${location}`,
-          time: `${date}`,
-        };
-      }
+      return {
+        description: `${status} - ${location}${details ? ' - ' + details : ''}`,
+        time: `${date}`,
+      };
     });
   });
 
