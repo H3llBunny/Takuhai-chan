@@ -55,7 +55,7 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
         throw new Error('No tracking updates available');
       }
 
-    return result.reverse();
+    return result;
   } catch (error) {
     await browser.close();
     if (calledFromPackages) {
