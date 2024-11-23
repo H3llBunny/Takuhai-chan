@@ -44,6 +44,10 @@ module.exports = {
         throw new Error('Invalid courier selected');
       }
 
+      if (packageName.length > 300){
+        throw new Error('Package name is too long');
+      }
+
       statuses = await courierService.trackShipment(trackingNumber);
     } catch (error) {
       await interaction.editReply(error.message);
