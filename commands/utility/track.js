@@ -17,7 +17,8 @@ module.exports = {
           { name: 'BG Post', value: 'bgpost' },
           { name: 'ExpressOne', value: 'expressOne' },
           { name: 'DHL', value: 'dhl' },
-          { name: 'Sameday', value: 'sameday' }
+          { name: 'Sameday', value: 'sameday' },
+          { name: 'BoxNow', value: 'boxnow' }
         )
     )
     .addStringOption((option) =>
