@@ -5,6 +5,7 @@ const expressOneService = require('../services/expressOneService');
 const dhlService = require('../services/dhlService');
 const samedayService = require('../services/samedayService');
 const boxnow = require('../services/boxnowService');
+const ups = require('../services/upsService');
 
 const courierServices = {
     econt: econtService,
@@ -14,6 +15,7 @@ const courierServices = {
     dhl: dhlService,
     sameday: samedayService,
     boxnow: boxnow,
+    ups: ups,
   };
   
   module.exports = courierServices;
