@@ -14,8 +14,8 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const isInvalid = await page.evaluate(() => {
-      const errorElement = document.querySelector('.tracker-alert.show');
-      return errorElement && errorElement.innerText.includes('Невалиден AWB номер');
+      const historyList = document.querySelector('ul.awb-history-parcel-list');
+      return historyList.children.length === 0;;
     });
 
     if (isInvalid) {
@@ -27,20 +27,18 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
       throw new Error('Tracking number is invalid.');
     }
 
-    await page.waitForSelector('ul.awb-history-list.one-parcel', { timeout: 10000 });
-    
     const result = await page.evaluate(() => {
-      const statusElements = document.querySelectorAll('ul.awb-history-list.one-parcel li:not(.heading)');
+      const statusElements = document.querySelectorAll('ul.awb-history-parcel-list li');
 
       return Array.from(statusElements).map((element) => {
-        const status = element.querySelector('.col-status').innerHTML.trim();
-        const location = element.querySelector('.col-location').innerHTML.trim();
-        const date = element.querySelector('.col-date').innerHTML.trim();
-        const country = element.querySelector('.col-country').innerHTML.trim();
+        const status = element.querySelector('.status-description')?.textContent.trim() || '';
+        const infoElements = element.querySelectorAll('.small-description-awb');
+        const time = infoElements[0]?.textContent.trim() || '';
+        const location = infoElements[1]?.textContent.trim() || '';
 
         return {
-          description: `${status}${location ? ' - ' + location : ''}${country ? ' - ' + country : ''}`,
-          time: `${date}`,
+          description: `${status} - ${location}`,
+          time: `${time}`,
         };
       });
     });
