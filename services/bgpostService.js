@@ -42,13 +42,13 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
     const statusElements = document.querySelectorAll('.overflow-x-auto .grid-cols-12:not(:first-child)');
 
     return Array.from(statusElements).map((element) => {
-      const status = element.children[0].innerText.trim();
-      const location = element.children[1].innerText.trim();
-      const details = element.children[2].innerText.trim();
-      const date = element.children[3].innerText.trim();
+      const status = element.children[0].innerText.trim() || '';
+      const location = element.children[1].innerText.trim() || '';
+      const details = element.children[2].innerText.trim() || '';
+      const date = element.children[3].innerText.trim() || '';
 
       return {
-        description: `${status} - ${location}${details ? ' - ' + details : ''}`,
+        description: `${status} - ${location} - ${ details }`,
         time: `${date}`,
       };
     });
