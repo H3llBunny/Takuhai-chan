@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
       option.setName('new_name').setDescription('Please provide the new name of the package').setRequired(true)
     ),
   async execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const packageName = interaction.options.getString('package_name');
     const newPackageName = interaction.options.getString('new_name');

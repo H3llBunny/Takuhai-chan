@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
 const courierServices = require('../../services/courierServices');
 
@@ -30,7 +30,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const courier = interaction.options.getString('couriers');
     const trackingNumber = interaction.options.getString('tracking_number');
@@ -71,9 +71,7 @@ module.exports = {
       const existingPackage = user.packages.find((pkg) => pkg.trackingNumber === trackingNumber);
 
       if (existingPackage) {
-        await interaction.editReply(
-          `<\@${interaction.user.id}> this package is already tracked, use command \`\`/packages\`\` to get the latest 3 statuses`
-        );
+        await interaction.editReply(`<\@${interaction.user.id}> this package is already tracked, use command \`\`/packages\`\` to get the latest 3 statuses`);
       } else {
         await usersCollection.updateOne(
           { _id: userId },
@@ -83,10 +81,7 @@ module.exports = {
             },
           }
         );
-        await interaction.channel.send(
-          `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
-          { ephemeral: false }
-        );
+        await interaction.channel.send(`<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`);
         await interaction.deleteReply();
       }
     } else {
@@ -94,10 +89,7 @@ module.exports = {
         _id: userId,
         packages: [packageData],
       });
-      await interaction.channel.send(
-        `<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,
-        { ephemeral: false }
-      );
+      await interaction.channel.send(`<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,);
       await interaction.deleteReply();
     }
   },

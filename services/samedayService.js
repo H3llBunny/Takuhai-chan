@@ -15,7 +15,7 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
 
     const isInvalid = await page.evaluate(() => {
       const historyList = document.querySelector('ul.awb-history-parcel-list');
-      return historyList.children.length === 0;;
+      return historyList.children.length === 0;
     });
 
     if (isInvalid) {
