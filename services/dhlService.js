@@ -2,7 +2,7 @@ const { DHL_API_KEY } = process.env;
 const { DHL_API_URL } = process.env;
 
 async function trackShipment(trackingNumber, calledFromPackages = false) {
-  const url = `${DHL_API_URL}trackingNumber=${trackingNumber}&service=express`;
+  const url = `${DHL_API_URL}trackingNumber=${trackingNumber}`;
 
   try {
     const response = await fetch(url, {
@@ -39,7 +39,7 @@ function getShipmentStatuses(shipmentData, calledFromPackages = false) {
 
   const statuses = shipmentData.shipments[0].events.map((event) => {
     const status = event.description;
-    const country = event.location.address.countryCode;
+    const country = event.location?.address?.addressLocality || "";
     const timestamp = event.timestamp;
 
     return {
