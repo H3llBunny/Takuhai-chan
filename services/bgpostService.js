@@ -9,11 +9,7 @@ async function trackShipment(trackingNumber, calledFromPackages = false) {
   const page = await browser.newPage();
 
   try {
-    await page.goto('https://bgpost.bg/postal-services/track-package');
-
-    await page.type('#table-search', trackingNumber);
-
-    await page.click('button.bg-gray');
+    await page.goto(`https://bgpost.bg/postal-services/track-package?itemid=${trackingNumber}`);
 
     await page.waitForSelector('.overflow-x-auto');
   } catch (error) {
