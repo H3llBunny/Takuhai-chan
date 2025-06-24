@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, StickerPackApplicationId } = require('discord.js');
+const { SlashCommandBuilder, StickerPackApplicationId, MessageFlags } = require('discord.js');
 const mongoDbService = require('../../services/mongoDbService');
 const courierServices = require('../../services/courierServices');
 const MAX_MESSAGE_LENGTH = 2000;
@@ -12,10 +12,21 @@ module.exports = {
         .setName('full_history')
         .setDescription('Show the full history of statuses for all your packages')
         .setRequired(false)
+    )
+    .addBooleanOption((option) => 
+      option
+        .setName('ephemeral')
+        .setDescription('Only you will see this response')
+        .setRequired(false)
     ),
 
   async execute(interaction) {
-    await interaction.deferReply();
+    const ephemeralCheck = interaction.options.getBoolean('ephemeral') || false;
+    if (ephemeralCheck) {
+    await interaction.deferReply(ephemeralCheck ? { flags: MessageFlags.Ephemeral } : '');
+    } else {
+      await interaction.deferReply();
+    }
 
     const userId = interaction.user.id;
     const fullHistory = interaction.options.getBoolean('full_history') || false;
