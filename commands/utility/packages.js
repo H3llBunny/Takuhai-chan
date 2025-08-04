@@ -81,7 +81,7 @@ module.exports = {
               formattedTime = date.toLocaleString();
             }
 
-            return `- ${status.description} - ${formattedTime}`;
+            return `☑ ${status.description} - ${formattedTime}`;
           });
 
           const packageMessage = `**Package from ${pkg.courier.toUpperCase()}:** \`\`${pkg.packageName}\`\`\n\`\`\`${statusMessages.join('\n')}\`\`\``;
