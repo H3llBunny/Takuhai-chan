@@ -6,7 +6,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('track')
     .setDescription('Add a new tracking number')
-    .addStringOption((option) =>
+    .addStringOption(option =>
       option
         .setName('couriers')
         .setDescription('Choose a courier')
@@ -19,14 +19,20 @@ module.exports = {
           { name: 'DHL', value: 'dhl' },
           { name: 'Sameday', value: 'sameday' },
           { name: 'BoxNow', value: 'boxnow' },
-          { name: 'UPS', value: 'ups'}
+          { name: 'UPS', value: 'ups' }
         )
     )
-    .addStringOption((option) =>
-      option.setName('tracking_number').setDescription('Please provide your tracking number').setRequired(true)
+    .addStringOption(option =>
+      option
+        .setName('tracking_number')
+        .setDescription('Please provide your tracking number')
+        .setRequired(true)
     )
-    .addStringOption((option) =>
-      option.setName('package_name').setDescription('Please provide a name for the package').setRequired(true)
+    .addStringOption(option =>
+      option
+        .setName('package_name')
+        .setDescription('Please provide a name for the package')
+        .setRequired(true)
     ),
 
   async execute(interaction) {
@@ -41,18 +47,13 @@ module.exports = {
 
     try {
       const courierService = courierServices[courier];
+      if (!courierService) throw new Error('Invalid courier selected');
 
-      if (!courierService) {
-        throw new Error('Invalid courier selected');
-      }
-
-      if (packageName.length > 300){
-        throw new Error('Package name is too long');
-      }
+      if (packageName.length > 300) throw new Error('Package name is too long');
 
       statuses = await courierService.trackShipment(trackingNumber);
     } catch (error) {
-      await interaction.editReply(error.message);
+      await interaction.editReply({ content: error.message });
       return;
     }
 
@@ -63,34 +64,33 @@ module.exports = {
       courier,
       trackingNumber,
       packageName,
-      statuses: statuses,
+      statuses,
       lastRefresh: new Date().toUTCString(),
     };
 
     if (user) {
-      const existingPackage = user.packages.find((pkg) => pkg.trackingNumber === trackingNumber);
+      const existingPackage = user.packages.find(pkg => pkg.trackingNumber === trackingNumber);
 
       if (existingPackage) {
-        await interaction.editReply(`<\@${interaction.user.id}> this package is already tracked, use command \`\`/packages\`\` to get the latest 3 statuses`);
-      } else {
-        await usersCollection.updateOne(
-          { _id: userId },
-          {
-            $push: {
-              packages: packageData,
-            },
-          }
-        );
-        await interaction.channel.send(`<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`);
-        await interaction.deleteReply();
+        await interaction.editReply({
+          content: `<@${userId}> This package is already tracked. Use \`/packages\` to view the latest statuses.`,
+        });
+        return;
       }
+
+      await usersCollection.updateOne(
+        { _id: userId },
+        { $push: { packages: packageData } }
+      );
     } else {
       await usersCollection.insertOne({
         _id: userId,
         packages: [packageData],
       });
-      await interaction.channel.send(`<\@${interaction.user.id}> Package with name: **${packageName}** was added to your tracking list`,);
-      await interaction.deleteReply();
     }
+
+    await interaction.editReply({
+      content: `✅ Package **${packageName}** has been added to your tracking list.`,
+    });
   },
 };
