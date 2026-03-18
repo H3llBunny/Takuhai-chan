@@ -17,13 +17,14 @@
   },
   "homepage": "https://github.com/H3llBunny/Takuhai-chan#readme",
   "dependencies": {
-    "discord.js": "^14.15.3",
+    "discord.js": "^13.17.1",
     "dotenv": "^16.4.5",
     "mongodb": "^6.10.0",
     "puppeteer": "^23.11.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "tar-fs": "^3.1.1"
+    "tar-fs": "^3.1.1",
+    "undici": "^7.24.4"
   },
   "devDependencies": {
     "eslint": "^9.9.1"
